@@ -40,11 +40,13 @@ public class Raven {
             } else
                 mRaven.mPrefHelper.setRavenClientId(ravenClientId);
             mRaven.cache = new LruCache<>(10);
+            FirebaseApp.initializeApp(context);
         }
-        FirebaseApp.initializeApp(context);
     }
 
     static Raven getInstance() {
+        if(mRaven == null)
+            throw  new RuntimeException("init needs to be called before getInstance is called");
         return mRaven;
     }
 

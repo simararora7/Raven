@@ -14,6 +14,11 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import simararora.ravendashboard.model.CreateModel;
+
 /**
  * Created by nateshrelhan on 3/15/18.
  */
@@ -83,6 +88,20 @@ public class ResourceActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(this, "Please enter at least one resource detail to proceed", Toast.LENGTH_LONG).show();
                     return;
                 }
+
+                DashboardApplication.getAPIService(this).createResource(new CreateModel(resourceName, resourceKeyValue))
+                        .enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                Toast.makeText(ResourceActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                Toast.makeText(ResourceActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
                 break;
         }
     }

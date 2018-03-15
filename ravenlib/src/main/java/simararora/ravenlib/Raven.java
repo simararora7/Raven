@@ -113,7 +113,7 @@ public class Raven {
         String path = String.format("Clients/%s/", clientId);
         OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(data, ravenResource, parseCompleteListener);
         //Source object is present at Clients/<clientId>/Sources/<sourceDocumentId>/
-        FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("SourceID", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
+        FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("$id", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
         //Resource object is present at Clients/<clientId>/Resources/<resourceDocumentId>/
         FirebaseFirestore.getInstance().document(path).collection("Resources").whereEqualTo("$id", String.format("%s-%s", ravenResource.getResourceType(), ravenResource.getResourceId())).get().addOnCompleteListener(onCompleteListener.resourceCompleteListener);
     }

@@ -25,6 +25,8 @@ import simararora.ravenlib.model.RavenResource;
 public class Raven {
     private static final String TAG = Raven.class.getSimpleName();
     private static final String authority = "raven.lt";
+    private static final String EXCEPTION_PREFIX = "Raven Warning: ";
+    private static final String ERROR_MISSING_CLIENT_ID = EXCEPTION_PREFIX + "Please enter your raven client id in your project's Manifest file!";
     private static Raven mRaven;
     private PrefHelper mPrefHelper;
     private LruCache<String, RavenResource> cache;
@@ -38,7 +40,7 @@ public class Raven {
             mRaven = new Raven(context);
             String ravenClientId = mRaven.mPrefHelper.readRavenClientId();
             if (ravenClientId == null || ravenClientId.equalsIgnoreCase(PrefHelper.NO_STRING_VALUE)) {
-                Log.i(TAG, "Raven Warning: Please enter your raven client id in your project's Manifest file!");
+                Log.i(TAG, ERROR_MISSING_CLIENT_ID);
             } else
                 mRaven.mPrefHelper.setRavenClientId(ravenClientId);
             mRaven.cache = new LruCache<>(10);
@@ -48,55 +50,76 @@ public class Raven {
 
     static Raven getInstance() {
         if (mRaven == null)
-            throw new RuntimeException("init needs to be called before getInstance is called");
+            throw new RuntimeException(EXCEPTION_PREFIX +"init needs to be called before getInstance is called");
         return mRaven;
     }
 
+    /**
+     * parse call for intent data and null parseCompleteListener
+     *
+     * @param intent intent to be parsed
+     * @return raw RavenResource
+     */
     public RavenResource parse(Intent intent) {
         return parse(intent, null);
     }
 
+    /**
+     * parse call for intent data and callback as parseCompleteListener
+     *
+     * @param intent                intent to be parsed
+     * @param parseCompleteListener used as callback for raw RavenResource containing params fetch from server
+     * @return raw RavenResource
+     */
     public RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener) {
         if (intent == null) {
             if (parseCompleteListener != null)
-                parseCompleteListener.onParseFailed(new NullPointerException("No Link Present"));
+                parseCompleteListener.onParseFailed(new NullPointerException(EXCEPTION_PREFIX +"No Link Present"));
             return null;
         }
         return parse(intent.getData(), parseCompleteListener);
     }
 
+    /**
+     * parse call for intent data and null parseCompleteListener
+     *
+     * @param data uri data to be parsed
+     * @return raw RavenResource
+     */
     public RavenResource parse(Uri data) {
         return parse(data, null);
     }
 
+    /**
+     * parse call for intent data and callback as parseCompleteListener
+     *
+     * @param data                  uri data to be parsed
+     * @param parseCompleteListener used as callback for raw RavenResource containing params fetch from server
+     * @return raw RavenResource
+     */
     public RavenResource parse(Uri data, ParseCompleteListener parseCompleteListener) {
+        //If data is null call onParseFailed
         if (data == null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new NullPointerException("No Link Present"));
             return null;
         }
-
+        //Fetching data from our LRU cache and returning response on the go
         RavenResource cachedResource = cache.get(data.toString());
         if (cachedResource != null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseComplete(cachedResource);
             return cachedResource;
         }
-
-        String authority = data.getAuthority();
         //Check if the url needs to be handled by Raven
-        if (!Raven.authority.equals(authority)) {
+        if (!Raven.authority.equals(data.getAuthority())) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new Exception("Authority Mismatch"));
             return null;
         }
-
-        String path = data.getPath();
-
         try {
             //Create RavenResource object
-            RavenResource ravenResource = new RavenResource(path);
-            ravenResource.setUri(data);
+            RavenResource ravenResource = new RavenResource(data);
             if (parseCompleteListener != null)
                 fetchResourceDetails(ravenResource, parseCompleteListener);
             return ravenResource;
@@ -107,10 +130,17 @@ public class Raven {
         }
     }
 
+    /**
+     * Used to fetch data from raw RavenResource
+     *
+     * @param ravenResource         raw RavenResource created with the intent data
+     * @param parseCompleteListener callback to be called after fetching data
+     */
     private void fetchResourceDetails(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
+        //If no client id is specified in Manifest
         String clientId = mPrefHelper.getRavenClientId();
         if (clientId == null) {
-            parseCompleteListener.onParseFailed(new NullPointerException("Client Id is Null"));
+            parseCompleteListener.onParseFailed(new NullPointerException(ERROR_MISSING_CLIENT_ID));
             return;
         }
         new RequestAsyncTask(ravenResource, parseCompleteListener).execute();
@@ -177,6 +207,7 @@ public class Raven {
                 e.printStackTrace();
                 parseCompleteListener.onParseFailed(e);
             } else {
+                //Updating our LRU cache
                 mRaven.cache.put(ravenResource.getUri().toString(), ravenResource);
                 parseCompleteListener.onParseComplete(ravenResource);
             }

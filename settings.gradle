@@ -1,1 +1,1 @@
-include ':app', ':ravenlib'
+include ':app', ':ravenlib', ':ravendashboard'

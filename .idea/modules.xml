@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Raven.iml" filepath="$PROJECT_DIR$/Raven.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ravendashboard/ravendashboard.iml" filepath="$PROJECT_DIR$/ravendashboard/ravendashboard.iml" />
       <module fileurl="file://$PROJECT_DIR$/ravenlib/ravenlib.iml" filepath="$PROJECT_DIR$/ravenlib/ravenlib.iml" />
     </modules>
   </component>

@@ -17,6 +17,7 @@ public class PrefHelper {
      */
     private static final String SHARED_PREF_FILE = "raven_referral_shared_pref";
     private static final String KEY_RAVEN_CLIENT_ID = "raven_client_id";
+    public static final String KEY_RAVEN_RESOURCE_HISTORY = "raven_resource_history";
     /**
      * A {@link String} value used where no string value is available.
      */

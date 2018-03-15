@@ -48,9 +48,9 @@ public class Raven {
         }
     }
 
-    static Raven getInstance() {
+    public static Raven getInstance() {
         if (mRaven == null)
-            throw new RuntimeException(EXCEPTION_PREFIX +"init needs to be called before getInstance is called");
+            throw new RuntimeException(EXCEPTION_PREFIX + "init needs to be called before getInstance is called");
         return mRaven;
     }
 
@@ -74,7 +74,7 @@ public class Raven {
     public RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener) {
         if (intent == null) {
             if (parseCompleteListener != null)
-                parseCompleteListener.onParseFailed(new NullPointerException(EXCEPTION_PREFIX +"No Link Present"));
+                parseCompleteListener.onParseFailed(new NullPointerException(EXCEPTION_PREFIX + "No Link Present"));
             return null;
         }
         return parse(intent.getData(), parseCompleteListener);
@@ -230,6 +230,5 @@ public class Raven {
                 parseCompleteListener.onParseFailed(new Exception("Failed to resolve link data"));
 
         }
-
     }
 }

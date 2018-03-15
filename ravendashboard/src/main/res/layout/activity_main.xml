@@ -9,27 +9,27 @@
 
     <TextView
         android:id="@+id/tv_resource"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.5"
-        android:background="@color/reSourceBackgroundColor"
+        android:background="@color/colorPrimary"
         android:fontFamily="sans-serif-smallcaps"
         android:gravity="center"
         android:text="Create resource"
-        android:textColor="@color/sourceBackgroundColor"
+        android:textColor="@color/colorAccent"
         android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_source"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.5"
-        android:background="@color/sourceBackgroundColor"
+        android:background="@color/colorAccent"
         android:fontFamily="sans-serif-smallcaps"
         android:gravity="center"
         android:text="Create source"
-        android:textColor="@color/reSourceBackgroundColor"
+        android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         android:textStyle="bold" />
 

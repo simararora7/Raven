@@ -17,6 +17,11 @@ public class DashboardApplication extends Application {
     private static final String API_ENDPOINT = "https://us-central1-raven-347c7.cloudfunctions.net/";
     private ApiService apiService;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
     public static ApiService getAPIService(Context context) {
         DashboardApplication application = (DashboardApplication) context.getApplicationContext();
         application.initAPIService();

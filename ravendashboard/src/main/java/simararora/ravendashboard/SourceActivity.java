@@ -2,7 +2,6 @@ package simararora.ravendashboard;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -11,19 +10,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import simararora.ravendashboard.model.CreateModel;
+import simararora.ravendashboard.model.Request;
 
 /**
  * Created by nateshrelhan on 3/15/18.
  */
 
-public class SourceActivity extends AppCompatActivity implements View.OnClickListener {
+public class SourceActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private ImageView ivAddSource;
     private LinearLayout llSourceDetails;
     private Button btSubmit;
@@ -33,6 +34,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source);
+        setUpActionBar("Source", true);
         ivAddSource = findViewById(R.id.iv_add_source);
         llSourceDetails = findViewById(R.id.ll_source_details);
         btSubmit = findViewById(R.id.bt_submit);
@@ -53,7 +55,7 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                 llNewSource.setGravity(Gravity.CENTER_VERTICAL);
                 final EditText etSourceKey = llNewSource.findViewById(R.id.et_key);
                 final EditText etSourceValue = llNewSource.findViewById(R.id.et_value);
-                LinearLayout.LayoutParams etNewSourceParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams etNewSourceParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
                 etNewSourceParams.weight = 0.5f;
                 etSourceKey.setLayoutParams(etNewSourceParams);
                 etSourceValue.setLayoutParams(etNewSourceParams);
@@ -69,25 +71,27 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                 llSourceDetails.addView(llNewSource);
                 break;
             case R.id.bt_submit:
+                boolean sourceKeyValeNotEmpty = false;
                 for (int i = 0; i < llSourceDetails.getChildCount(); i++) {
                     LinearLayout llSource = (LinearLayout) llSourceDetails.getChildAt(i);
                     String sourceKey = ((EditText) llSource.findViewById(R.id.et_key)).getText().toString();
                     String sourceValue = ((EditText) llSource.findViewById(R.id.et_value)).getText().toString();
                     if (AppUtil.isEmptyOrNullString(sourceKey) || AppUtil.isEmptyOrNullString(sourceValue))
                         continue;
+                    sourceKeyValeNotEmpty = true;
                     sourceKeyValue.put(sourceKey, sourceValue);
                 }
-                if (sourceKeyValue.size() == 0) {
-                    Toast.makeText(this, "Please enter at least one source detail to proceed", Toast.LENGTH_LONG).show();
+                if (!sourceKeyValeNotEmpty || sourceKeyValue.size() == 0) {
+                    Toast.makeText(this, "Please enter at least one source detail to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-
-                DashboardApplication.getAPIService(this).createSource(new CreateModel(sourceKeyValue))
+                final Request sourceRequest = new Request(sourceKeyValue);
+                DashboardApplication.getAPIService(this).createSource(new Request(sourceKeyValue))
                         .enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
                                 Toast.makeText(SourceActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+                                ResourceSession.getInstance(SourceActivity.this).updateHistory(ResourceSession.KEY_SOURCE_HISTORY, response.body(), new Gson().toJson(sourceRequest));
                             }
 
                             @Override

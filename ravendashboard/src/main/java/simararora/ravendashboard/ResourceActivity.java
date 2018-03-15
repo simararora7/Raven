@@ -2,7 +2,6 @@ package simararora.ravendashboard;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -11,19 +10,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import simararora.ravendashboard.model.CreateModel;
+import simararora.ravendashboard.model.Request;
 
 /**
  * Created by nateshrelhan on 3/15/18.
  */
 
-public class ResourceActivity extends AppCompatActivity implements View.OnClickListener {
+public class ResourceActivity extends BaseAppCompatActivity implements View.OnClickListener {
     private EditText etResourceName;
     private ImageView ivAddResource;
     private LinearLayout llResourceDetails;
@@ -34,6 +35,7 @@ public class ResourceActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resource);
+        setUpActionBar("Resource", true);
         etResourceName = findViewById(R.id.et_resource_name);
         ivAddResource = findViewById(R.id.iv_add_resource);
         llResourceDetails = findViewById(R.id.ll_resource_details);
@@ -42,6 +44,7 @@ public class ResourceActivity extends AppCompatActivity implements View.OnClickL
         ivAddResource.setOnClickListener(this);
         resourceKeyValue = new HashMap<>();
     }
+
 
     @Override
     public void onClick(View v) {
@@ -55,7 +58,7 @@ public class ResourceActivity extends AppCompatActivity implements View.OnClickL
                 llNewResource.setGravity(Gravity.CENTER_VERTICAL);
                 final EditText etResourceKey = llNewResource.findViewById(R.id.et_key);
                 final EditText etResourceValue = llNewResource.findViewById(R.id.et_value);
-                LinearLayout.LayoutParams etNewResourceParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams etNewResourceParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
                 etNewResourceParams.weight = 0.5f;
                 etResourceKey.setLayoutParams(etNewResourceParams);
                 etResourceValue.setLayoutParams(etNewResourceParams);
@@ -73,27 +76,30 @@ public class ResourceActivity extends AppCompatActivity implements View.OnClickL
             case R.id.bt_submit:
                 String resourceName = etResourceName.getText().toString();
                 if (AppUtil.isEmptyOrNullString(resourceName)) {
-                    Toast.makeText(this, "Please enter resource name to proceed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Please enter resource name to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                boolean resourceKeyValeNotEmpty = false;
                 for (int i = 0; i < llResourceDetails.getChildCount(); i++) {
                     LinearLayout llResource = (LinearLayout) llResourceDetails.getChildAt(i);
                     String resourceKey = ((EditText) llResource.findViewById(R.id.et_key)).getText().toString();
                     String resourceValue = ((EditText) llResource.findViewById(R.id.et_value)).getText().toString();
                     if (AppUtil.isEmptyOrNullString(resourceKey) || AppUtil.isEmptyOrNullString(resourceValue))
                         continue;
+                    resourceKeyValeNotEmpty = true;
                     resourceKeyValue.put(resourceKey, resourceValue);
                 }
-                if (resourceKeyValue.size() == 0) {
-                    Toast.makeText(this, "Please enter at least one resource detail to proceed", Toast.LENGTH_LONG).show();
+                if (!resourceKeyValeNotEmpty || resourceKeyValue.size() == 0) {
+                    Toast.makeText(this, "Please enter at least one resource detail to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                DashboardApplication.getAPIService(this).createResource(new CreateModel(resourceName, resourceKeyValue))
+                final Request resourceRequest = new Request(resourceName, resourceKeyValue);
+                DashboardApplication.getAPIService(this).createResource(resourceRequest)
                         .enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
                                 Toast.makeText(ResourceActivity.this, response.body(), Toast.LENGTH_SHORT).show();
+                                ResourceSession.getInstance(ResourceActivity.this).updateHistory(ResourceSession.KEY_RESOURCE_HISTORY,response.body(), new Gson().toJson(resourceRequest));
                             }
 
                             @Override

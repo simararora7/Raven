@@ -9,7 +9,7 @@ import java.util.Map;
  * Created by Simar Arora on 15/03/18.
  */
 
-public class CreateModel {
+public class Request {
 
     @SerializedName("type")
     @Expose
@@ -19,16 +19,16 @@ public class CreateModel {
     @Expose
     private Map<String, String> data;
 
-    public CreateModel(String type, Map<String, String> data) {
+    public Request(String type, Map<String, String> data) {
         this.type = type;
         this.data = data;
     }
 
-    public CreateModel(Map<String, String> data) {
+    public Request(Map<String, String> data) {
         this.data = data;
     }
 
-    public CreateModel() {
+    public Request() {
     }
 
     public String getType() {

@@ -1,8 +1,7 @@
 package simararora.ravenlib.model;
 
-import org.json.JSONObject;
-
 import java.net.MalformedURLException;
+import java.util.Map;
 
 /**
  * Created by Simar Arora on 15/03/18.
@@ -12,8 +11,8 @@ public class RavenResource {
     private String resourceType;
     private String resourceId;
     private String sourceId;
-    private JSONObject resourceIdParams;
-    private JSONObject sourceIdParams;
+    private Map<String, Object> resourceIdParams;
+    private Map<String, Object> sourceIdParams;
 
     public RavenResource(String path) throws Exception{
         String[] tokens = path.substring(1).split("/");
@@ -40,11 +39,15 @@ public class RavenResource {
         return sourceId;
     }
 
-    public JSONObject getResourceIdParams() {
+    public Map<String, Object> getResourceIdParams() {
         return resourceIdParams;
     }
 
-    public JSONObject getSourceIdParams() {
-        return sourceIdParams;
+    public void setResourceIdParams(Map<String, Object> resourceIdParams) {
+        this.resourceIdParams = resourceIdParams;
+    }
+
+    public void setSourceIdParams(Map<String, Object> sourceIdParams) {
+        this.sourceIdParams = sourceIdParams;
     }
 }

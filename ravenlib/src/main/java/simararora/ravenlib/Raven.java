@@ -9,9 +9,9 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import simararora.ravenlib.model.RavenResource;
 
@@ -45,12 +45,15 @@ public class Raven {
         FirebaseApp.initializeApp(context);
     }
 
+    public static Raven getInstance() {
+        return mRaven;
+    }
 
-    public static RavenResource parse(Intent intent) {
+    public RavenResource parse(Intent intent) {
         return parse(intent, null);
     }
 
-    public static RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener) {
+    public RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener) {
         if (intent == null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new NullPointerException());
@@ -59,11 +62,11 @@ public class Raven {
         return parse(intent.getData(), null);
     }
 
-    public static RavenResource parse(Uri data) {
+    public RavenResource parse(Uri data) {
         return parse(data, null);
     }
 
-    public static RavenResource parse(Uri data, ParseCompleteListener parseCompleteListener) {
+    public RavenResource parse(Uri data, ParseCompleteListener parseCompleteListener) {
         if (data == null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new NullPointerException());
@@ -90,18 +93,75 @@ public class Raven {
         }
     }
 
-    private static void fetchResourceDetails(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
-
+    private void fetchResourceDetails(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
+        String clientId = mPrefHelper.getRavenClientId();
+        clientId = "zcUDoLdHnKLfjlIFd9bu";
+        if (clientId == null) {
+            parseCompleteListener.onParseFailed(new NullPointerException("Client Id is Null"));
+            return;
+        }
+        String path = String.format("Clients/%s/", clientId);
+        OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(ravenResource, parseCompleteListener);
+        FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("SourceID", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
+        FirebaseFirestore.getInstance().document(path).collection("Resources").whereEqualTo("$id", String.format("%s-%s", ravenResource.getResourceType(), ravenResource.getResourceId())).get().addOnCompleteListener(onCompleteListener.resourceCompleteListener);
     }
 
-    public static void testRead() {
-        DocumentReference documentReference = FirebaseFirestore.getInstance().document("test/user");
-        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    private static class OnCompleteListenerComposite {
+
+        private RavenResource ravenResource;
+        private ParseCompleteListener parseCompleteListener;
+
+        private Boolean sourceCompleted;
+        private Boolean resourceCompleted;
+
+        OnCompleteListenerComposite(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
+            this.ravenResource = ravenResource;
+            this.parseCompleteListener = parseCompleteListener;
+        }
+
+        private OnCompleteListener<QuerySnapshot> sourceOnCompleteListener = new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Log.d("Simar", "onComplete: " + task.isSuccessful());
-                Log.d("Simar", "onComplete: " + task.getResult().toString());
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    sourceCompleted = false;
+                    for (DocumentSnapshot document: task.getResult()){
+                        ravenResource.setSourceIdParams(document.getData());
+                        sourceCompleted = true;
+                        break;
+                    }
+                }else{
+                    sourceCompleted = false;
+                }
+                checkResponses();
             }
-        });
+        };
+
+        private OnCompleteListener<QuerySnapshot> resourceCompleteListener = new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    resourceCompleted = false;
+                    for (DocumentSnapshot document: task.getResult()){
+                        ravenResource.setResourceIdParams(document.getData());
+                        resourceCompleted = true;
+                        break;
+                    }
+                }else{
+                    resourceCompleted = false;
+                }
+                checkResponses();
+            }
+        };
+
+        private void checkResponses(){
+            if (sourceCompleted == null || resourceCompleted == null)
+                return;
+            if (sourceCompleted && resourceCompleted){
+                parseCompleteListener.onParseComplete(ravenResource);
+            }else {
+                parseCompleteListener.onParseFailed(new Exception());
+            }
+        }
+
     }
 }

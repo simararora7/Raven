@@ -2,6 +2,7 @@ package simararora.ravenlib;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -12,17 +13,66 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import simararora.ravenlib.model.RavenResource;
+
 /**
  * Created by Simar Arora on 15/03/18.
  */
 
 public class Raven {
 
+    public static final String TAG = Raven.class.getSimpleName();
+    private static final String authority = "www.google.com";
+
     public static void init(Context context){
         FirebaseApp.initializeApp(context);
     }
 
-    public static void parse(Intent data){
+    public static RavenResource parse(Intent intent){
+        return parse(intent, null);
+    }
+
+    public static RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener){
+        if (intent == null){
+            if (parseCompleteListener != null)
+                parseCompleteListener.onParseFailed(new NullPointerException());
+            return null;
+        }
+        return parse(intent.getData(), null);
+    }
+
+    public static RavenResource parse(Uri data){
+        return parse(data, null);
+    }
+
+    public static RavenResource parse(Uri data, ParseCompleteListener parseCompleteListener){
+        if (data == null){
+            if (parseCompleteListener != null)
+                parseCompleteListener.onParseFailed(new NullPointerException());
+            return null;
+        }
+        String authority = data.getAuthority();
+        if (!Raven.authority.equals(authority)){
+            if (parseCompleteListener != null)
+                parseCompleteListener.onParseFailed(new Exception("Authority Mismatch"));
+            return null;
+        }
+
+        String path = data.getPath();
+
+        try {
+            RavenResource ravenResource = new RavenResource(path);
+            if (parseCompleteListener != null)
+                fetchResourceDetails(ravenResource, parseCompleteListener);
+            return ravenResource;
+        } catch (Exception e) {
+            if (parseCompleteListener != null)
+                parseCompleteListener.onParseFailed(e);
+            return null;
+        }
+    }
+
+    private static void fetchResourceDetails(RavenResource ravenResource, ParseCompleteListener parseCompleteListener){
 
     }
 

@@ -14,6 +14,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.List;
+
 import simararora.ravenlib.model.RavenResource;
 
 /**
@@ -23,6 +25,8 @@ import simararora.ravenlib.model.RavenResource;
 public class Raven {
     private static final String TAG = Raven.class.getSimpleName();
     private static final String authority = "raven.lt";
+    private static final String EXCEPTION_PREFIX = "Raven Warning: ";
+    private static final String ERROR_MISSING_CLIENT_ID = EXCEPTION_PREFIX + "Please enter your raven client id in your project's Manifest file!";
     private static Raven mRaven;
     private PrefHelper mPrefHelper;
     private LruCache<String, RavenResource> cache;
@@ -36,7 +40,7 @@ public class Raven {
             mRaven = new Raven(context);
             String ravenClientId = mRaven.mPrefHelper.readRavenClientId();
             if (ravenClientId == null || ravenClientId.equalsIgnoreCase(PrefHelper.NO_STRING_VALUE)) {
-                Log.i(TAG, "Raven Warning: Please enter your raven client id in your project's Manifest file!");
+                Log.i(TAG, ERROR_MISSING_CLIENT_ID);
             } else
                 mRaven.mPrefHelper.setRavenClientId(ravenClientId);
             mRaven.cache = new LruCache<>(10);
@@ -45,56 +49,77 @@ public class Raven {
     }
 
     static Raven getInstance() {
-        if(mRaven == null)
-            throw  new RuntimeException("init needs to be called before getInstance is called");
+        if (mRaven == null)
+            throw new RuntimeException(EXCEPTION_PREFIX +"init needs to be called before getInstance is called");
         return mRaven;
     }
 
+    /**
+     * parse call for intent data and null parseCompleteListener
+     *
+     * @param intent intent to be parsed
+     * @return raw RavenResource
+     */
     public RavenResource parse(Intent intent) {
         return parse(intent, null);
     }
 
+    /**
+     * parse call for intent data and callback as parseCompleteListener
+     *
+     * @param intent                intent to be parsed
+     * @param parseCompleteListener used as callback for raw RavenResource containing params fetch from server
+     * @return raw RavenResource
+     */
     public RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener) {
         if (intent == null) {
             if (parseCompleteListener != null)
-                parseCompleteListener.onParseFailed(new NullPointerException("No Link Present"));
+                parseCompleteListener.onParseFailed(new NullPointerException(EXCEPTION_PREFIX +"No Link Present"));
             return null;
         }
         return parse(intent.getData(), parseCompleteListener);
     }
 
+    /**
+     * parse call for intent data and null parseCompleteListener
+     *
+     * @param data uri data to be parsed
+     * @return raw RavenResource
+     */
     public RavenResource parse(Uri data) {
         return parse(data, null);
     }
 
+    /**
+     * parse call for intent data and callback as parseCompleteListener
+     *
+     * @param data                  uri data to be parsed
+     * @param parseCompleteListener used as callback for raw RavenResource containing params fetch from server
+     * @return raw RavenResource
+     */
     public RavenResource parse(Uri data, ParseCompleteListener parseCompleteListener) {
+        //If data is null call onParseFailed
         if (data == null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new NullPointerException("No Link Present"));
             return null;
         }
-
+        //Fetching data from our LRU cache and returning response on the go
         RavenResource cachedResource = cache.get(data.toString());
-        if (cachedResource != null){
+        if (cachedResource != null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseComplete(cachedResource);
             return cachedResource;
         }
-
-        String authority = data.getAuthority();
         //Check if the url needs to be handled by Raven
-        if (!Raven.authority.equals(authority)) {
+        if (!Raven.authority.equals(data.getAuthority())) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new Exception("Authority Mismatch"));
             return null;
         }
-
-        String path = data.getPath();
-
         try {
             //Create RavenResource object
-            RavenResource ravenResource = new RavenResource(path);
-            ravenResource.setUri(data);
+            RavenResource ravenResource = new RavenResource(data);
             if (parseCompleteListener != null)
                 fetchResourceDetails(ravenResource, parseCompleteListener);
             return ravenResource;
@@ -105,13 +130,21 @@ public class Raven {
         }
     }
 
+    /**
+     * Used to fetch data from raw RavenResource
+     *
+     * @param ravenResource         raw RavenResource created with the intent data
+     * @param parseCompleteListener callback to be called after fetching data
+     */
     private void fetchResourceDetails(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
+        //If no client id is specified in Manifest
         String clientId = mPrefHelper.getRavenClientId();
         if (clientId == null) {
-            parseCompleteListener.onParseFailed(new NullPointerException("Client Id is Null"));
+            parseCompleteListener.onParseFailed(new NullPointerException(ERROR_MISSING_CLIENT_ID));
             return;
         }
         String path = String.format("Clients/%s/", clientId);
+        //Parallel requests are sent for source and resource.
         OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(ravenResource, parseCompleteListener);
         //Source object is present at Clients/<clientId>/Sources/<sourceDocumentId>/
         FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("$id", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
@@ -119,7 +152,6 @@ public class Raven {
         FirebaseFirestore.getInstance().document(path).collection("Resources").whereEqualTo("$id", String.format("%s-%s", ravenResource.getResourceType(), ravenResource.getResourceId())).get().addOnCompleteListener(onCompleteListener.resourceCompleteListener);
     }
 
-    //Parallel requests are sent for source and resource.
     // The OnCompleteListenerComposite object waits for both the responses
     // and notifies the user once both responses have been successfully fetched
     private class OnCompleteListenerComposite {
@@ -134,38 +166,43 @@ public class Raven {
             this.parseCompleteListener = parseCompleteListener;
         }
 
+        /**
+         * Callback called for after fetching source details from server
+         */
         private OnCompleteListener<QuerySnapshot> sourceOnCompleteListener = new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    sourceCompleted = false;
-                    for (DocumentSnapshot document : task.getResult()) {
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    if (!documentSnapshots.isEmpty()) {
                         //First result matching the query is used
-                        ravenResource.setSourceIdParams(document.getData());
+                        ravenResource.setSourceIdParams(documentSnapshots.get(0).getData());
                         sourceCompleted = true;
-                        break;
-                    }
-                } else {
+                    } else
+                        sourceCompleted = false;
+                } else
                     sourceCompleted = false;
-                }
                 checkResponses();
             }
         };
 
+        /**
+         * Callback called for after fetching resource details from server
+         */
         private OnCompleteListener<QuerySnapshot> resourceCompleteListener = new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    resourceCompleted = false;
-                    for (DocumentSnapshot document : task.getResult()) {
+                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
+                    if (!documentSnapshots.isEmpty()) {
                         //First result matching the query is used
-                        ravenResource.setResourceIdParams(document.getData());
+                        ravenResource.setResourceIdParams(documentSnapshots.get(0).getData());
                         resourceCompleted = true;
-                        break;
-                    }
-                } else {
+                    } else
+                        resourceCompleted = false;
+
+                } else
                     resourceCompleted = false;
-                }
                 checkResponses();
             }
         };
@@ -186,11 +223,12 @@ public class Raven {
             //If both are true, both responses have been fetched successfully and can be passed to the user
             if (sourceCompleted && resourceCompleted) {
                 parseCompleteListener.onParseComplete(ravenResource);
+                //Updating our LRU cache
                 cache.put(ravenResource.getUri().toString(), ravenResource);
-            } else {
+            } else
                 //Else we notify failure to the user
                 parseCompleteListener.onParseFailed(new Exception("Failed to resolve link data"));
-            }
+
         }
 
     }

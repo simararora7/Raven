@@ -56,7 +56,10 @@ public class PrefHelper {
         return mPrefHelper;
     }
 
-
+    /**
+     *
+     * @return Raven client id that users sets up in manifest file of their app
+     */
     public String readRavenClientId() {
         String ravenClientId = null;
         String metaDataKey = "raven.sdk.ClientId";

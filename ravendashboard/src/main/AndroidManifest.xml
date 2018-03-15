@@ -23,6 +23,7 @@
         <activity android:name=".ResourceActivity" />
         <activity android:name=".SourceActivity" />
         <activity android:name=".history.HistoryActivity" />
+        <activity android:name=".AnalyticsActivity" />
     </application>
 
 </manifest>

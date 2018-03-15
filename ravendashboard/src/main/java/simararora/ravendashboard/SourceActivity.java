@@ -2,18 +2,14 @@ package simararora.ravendashboard;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,69 +20,37 @@ import simararora.ravendashboard.model.Request;
  * Created by nateshrelhan on 3/15/18.
  */
 
-public class SourceActivity extends BaseAppCompatActivity implements View.OnClickListener {
-    private ImageView ivAddSource;
-    private LinearLayout llSourceDetails;
-    private Button btSubmit;
-    private Map<String, String> sourceKeyValue;
-
+public class SourceActivity extends BaseCreateDataActivity implements View.OnClickListener {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source);
         setUpActionBar("Source", true);
-        ivAddSource = findViewById(R.id.iv_add_source);
-        llSourceDetails = findViewById(R.id.ll_source_details);
-        btSubmit = findViewById(R.id.bt_submit);
-        btSubmit.setOnClickListener(this);
-        ivAddSource.setOnClickListener(this);
-        sourceKeyValue = new HashMap<>();
+        keyValue = new HashMap<>();
+        initializeCommonLayout();
     }
 
     @Override
     public void onClick(View v) {
+        super.onClick(v);
         switch (v.getId()) {
-            case R.id.iv_add_source:
-                final LinearLayout llNewSource = (LinearLayout) getLayoutInflater().inflate(R.layout.item_key_value, null);
-                LinearLayout.LayoutParams llNewSourceParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                llNewSourceParams.weight = 1.0f;
-                llNewSourceParams.setMargins(AppUtil.dpToPx(this, 12), AppUtil.dpToPx(this, 12), AppUtil.dpToPx(this, 12), AppUtil.dpToPx(this, 12));
-                llNewSource.setLayoutParams(llNewSourceParams);
-                llNewSource.setGravity(Gravity.CENTER_VERTICAL);
-                final EditText etSourceKey = llNewSource.findViewById(R.id.et_key);
-                final EditText etSourceValue = llNewSource.findViewById(R.id.et_value);
-                LinearLayout.LayoutParams etNewSourceParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT);
-                etNewSourceParams.weight = 0.5f;
-                etSourceKey.setLayoutParams(etNewSourceParams);
-                etSourceValue.setLayoutParams(etNewSourceParams);
-
-                ImageView ivRemoveSource = llNewSource.findViewById(R.id.iv_remove);
-                ivRemoveSource.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        sourceKeyValue.remove(etSourceKey.getText().toString());
-                        llSourceDetails.removeView(llNewSource);
-                    }
-                });
-                llSourceDetails.addView(llNewSource);
-                break;
             case R.id.bt_submit:
                 boolean sourceKeyValeNotEmpty = false;
-                for (int i = 0; i < llSourceDetails.getChildCount(); i++) {
-                    LinearLayout llSource = (LinearLayout) llSourceDetails.getChildAt(i);
+                for (int i = 0; i < llDetails.getChildCount(); i++) {
+                    LinearLayout llSource = (LinearLayout) llDetails.getChildAt(i);
                     String sourceKey = ((EditText) llSource.findViewById(R.id.et_key)).getText().toString();
                     String sourceValue = ((EditText) llSource.findViewById(R.id.et_value)).getText().toString();
                     if (AppUtil.isEmptyOrNullString(sourceKey) || AppUtil.isEmptyOrNullString(sourceValue))
                         continue;
                     sourceKeyValeNotEmpty = true;
-                    sourceKeyValue.put(sourceKey, sourceValue);
+                    keyValue.put(sourceKey, sourceValue);
                 }
-                if (!sourceKeyValeNotEmpty || sourceKeyValue.size() == 0) {
+                if (!sourceKeyValeNotEmpty || keyValue.size() == 0) {
                     Toast.makeText(this, "Please enter at least one source detail to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final Request sourceRequest = new Request(sourceKeyValue);
-                DashboardApplication.getAPIService(this).createSource(new Request(sourceKeyValue))
+                final Request sourceRequest = new Request(keyValue);
+                DashboardApplication.getAPIService(this).createSource(new Request(keyValue))
                         .enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {

@@ -17,8 +17,8 @@ public class ResourceSession {
     private static final String SHARED_PREF_FILE = "resource_session_shared_pref";
     public static final String KEY_RESOURCE_HISTORY = "resource_history";
     public static final String KEY_SOURCE_HISTORY = "source_history";
-    private static final String resourceSeparator = "&&&";
-    private static final String resourceEquality = "===";
+    private static final String _resourceSeparator = "&&&";
+    private static final String _resourceEquality = "===";
 
     /**
      * A {@link String} value used where no string value is available.
@@ -75,23 +75,34 @@ public class ResourceSession {
         mResourceSession.mPrefEditor.apply();
     }
 
+    /**
+     * @param sharedPrefKey key of history type
+     * @return list of history
+     */
     public List<History> getResourceHistory(String sharedPrefKey) {
         List<History> ravenResourceHistoryList = new ArrayList<>();
-        String[] resourceHistories = getString(sharedPrefKey).split(resourceSeparator);
+        String[] resourceHistories = getString(sharedPrefKey).split(_resourceSeparator);
         if (resourceHistories.length == 0) return ravenResourceHistoryList;
         for (String resourceHistory : resourceHistories) {
-            String[] specificResourceHistory = resourceHistory.split(resourceEquality);
+            String[] specificResourceHistory = resourceHistory.split(_resourceEquality);
             if (specificResourceHistory.length < 2) continue;
             ravenResourceHistoryList.add(new History(specificResourceHistory[0], specificResourceHistory[1]));
         }
         return ravenResourceHistoryList;
     }
 
+    /**
+     * Appending history in shared preferences
+     *
+     * @param sharedPrefKey key of history type
+     * @param encodedKey    encoded key received after entering details
+     * @param value         value entered by user
+     */
     public void updateHistory(String sharedPrefKey, String encodedKey, String value) {
         String existingResourceHistory = getString(sharedPrefKey);
         if (existingResourceHistory == null || existingResourceHistory.equalsIgnoreCase(NO_STRING_VALUE))
-            setString(sharedPrefKey, encodedKey + resourceEquality + value);
+            setString(sharedPrefKey, encodedKey + _resourceEquality + value);
         else
-            setString(sharedPrefKey, existingResourceHistory + resourceSeparator + encodedKey + resourceEquality + value);
+            setString(sharedPrefKey, existingResourceHistory + _resourceSeparator + encodedKey + _resourceEquality + value);
     }
 }

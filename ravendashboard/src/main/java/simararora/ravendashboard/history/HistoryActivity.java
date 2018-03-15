@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import simararora.ravendashboard.BaseAppCompatActivity;
+import simararora.ravendashboard.BaseCreateDataActivity;
 import simararora.ravendashboard.R;
 import simararora.ravendashboard.ResourceSession;
 import simararora.ravendashboard.adapter.HistoryAdapter;
@@ -14,7 +14,7 @@ import simararora.ravendashboard.adapter.HistoryAdapter;
  * Created by nateshrelhan on 3/15/18.
  */
 
-public class HistoryActivity extends BaseAppCompatActivity {
+public class HistoryActivity extends BaseCreateDataActivity {
     public static final String KEY_FROM = "from_";
     public static final String KEY_FROM_RESOURCE = "resource_source";
     public static final String KEY_FROM_SOURCE = "source";

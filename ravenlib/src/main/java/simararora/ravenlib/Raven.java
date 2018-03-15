@@ -57,7 +57,7 @@ public class Raven {
     public RavenResource parse(Intent intent, ParseCompleteListener parseCompleteListener) {
         if (intent == null) {
             if (parseCompleteListener != null)
-                parseCompleteListener.onParseFailed(new NullPointerException());
+                parseCompleteListener.onParseFailed(new NullPointerException("No Link Present"));
             return null;
         }
         return parse(intent.getData(), parseCompleteListener);
@@ -70,7 +70,7 @@ public class Raven {
     public RavenResource parse(Uri data, ParseCompleteListener parseCompleteListener) {
         if (data == null) {
             if (parseCompleteListener != null)
-                parseCompleteListener.onParseFailed(new NullPointerException());
+                parseCompleteListener.onParseFailed(new NullPointerException("No Link Present"));
             return null;
         }
 
@@ -189,7 +189,7 @@ public class Raven {
                 cache.put(ravenResource.getUri().toString(), ravenResource);
             } else {
                 //Else we notify failure to the user
-                parseCompleteListener.onParseFailed(new Exception());
+                parseCompleteListener.onParseFailed(new Exception("Failed to resolve link data"));
             }
         }
 

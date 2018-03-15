@@ -21,12 +21,12 @@ public class MainActivity extends RavenActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_raven);
         messageView = findViewById(R.id.tv_data);
         if (ravenResource != null){
             messageView.setText(Html.fromHtml(ravenResource.toString()));
         }else if (exception != null){
-            messageView.setText(Html.fromHtml(exception.getMessage()));
+            messageView.setText(exception.getMessage());
         }
 
     }
@@ -42,6 +42,6 @@ public class MainActivity extends RavenActivity {
     public void onParseFailed(Exception exception) {
         this.exception = exception;
         if (messageView != null)
-            messageView.setText(Html.fromHtml(exception.getMessage()));
+            messageView.setText(exception.getMessage());
     }
 }

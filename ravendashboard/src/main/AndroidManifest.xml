@@ -16,6 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ResourceActivity" />
+        <activity android:name=".SourceActivity" />
     </application>
 
 </manifest>

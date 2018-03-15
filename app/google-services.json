@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "92416567272",
+    "firebase_url": "https://raven-347c7.firebaseio.com",
+    "project_id": "raven-347c7",
+    "storage_bucket": "raven-347c7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92416567272:android:0b720e7437d5c1e9",
+        "android_client_info": {
+          "package_name": "simararora.raven"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92416567272-5ulhg8f0npnvu0mgp29m1b46p70lr51o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "simararora.raven",
+            "certificate_hash": "bb41dec5271d28d68bdb102e72b8f7a213a6b243"
+          }
+        },
+        {
+          "client_id": "92416567272-0ec6s0h8kp5en5n4tlh65omeg50djo71.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD45g8HTi5EmdqbbZYSW3mRvbRmvnnA7B4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "92416567272-0ec6s0h8kp5en5n4tlh65omeg50djo71.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -15,6 +15,10 @@ public class RavenResource {
     private Map<String, Object> sourceIdParams;
 
     public RavenResource(String path) throws Exception{
+        //Path is of the type /ab/abcde/abc
+        //Where ab is resourceType
+        //abcde is resourceId
+        //abc is sourceId
         String[] tokens = path.substring(1).split("/");
         if (tokens.length != 3)
             throw new MalformedURLException();

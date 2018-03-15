@@ -80,6 +80,7 @@ public class Raven {
         }
 
         String authority = data.getAuthority();
+        //Check if the url needs to be handled by Raven
         if (!Raven.authority.equals(authority)) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new Exception("Authority Mismatch"));
@@ -89,6 +90,7 @@ public class Raven {
         String path = data.getPath();
 
         try {
+            //Create RavenResource object
             RavenResource ravenResource = new RavenResource(path);
             if (parseCompleteListener != null)
                 fetchResourceDetails(data, ravenResource, parseCompleteListener);
@@ -108,16 +110,20 @@ public class Raven {
         }
         String path = String.format("Clients/%s/", clientId);
         OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(data, ravenResource, parseCompleteListener);
+        //Source object is present at Clients/<clientId>/Sources/<sourceDocumentId>/
         FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("SourceID", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
+        //Resource object is present at Clients/<clientId>/Resources/<resourceDocumentId>/
         FirebaseFirestore.getInstance().document(path).collection("Resources").whereEqualTo("$id", String.format("%s-%s", ravenResource.getResourceType(), ravenResource.getResourceId())).get().addOnCompleteListener(onCompleteListener.resourceCompleteListener);
     }
 
+    //Parallel requests are sent for source and resource.
+    // The OnCompleteListenerComposite object waits for both the responses
+    // and notifies the user once both responses have been successfully fetched
     private class OnCompleteListenerComposite {
 
         private Uri data;
         private RavenResource ravenResource;
         private ParseCompleteListener parseCompleteListener;
-
         private Boolean sourceCompleted;
         private Boolean resourceCompleted;
 
@@ -133,6 +139,7 @@ public class Raven {
                 if (task.isSuccessful()) {
                     sourceCompleted = false;
                     for (DocumentSnapshot document : task.getResult()) {
+                        //First result matching the query is used
                         ravenResource.setSourceIdParams(document.getData());
                         sourceCompleted = true;
                         break;
@@ -150,6 +157,7 @@ public class Raven {
                 if (task.isSuccessful()) {
                     resourceCompleted = false;
                     for (DocumentSnapshot document : task.getResult()) {
+                        //First result matching the query is used
                         ravenResource.setResourceIdParams(document.getData());
                         resourceCompleted = true;
                         break;
@@ -161,13 +169,25 @@ public class Raven {
             }
         };
 
+
+        //checkResponse checks if both responses have been fetched and notifies the user accordingly
+        //Since ths method is going to run on the same thread always, there are no race conditions
         private void checkResponses() {
+
+            //These variables have three states
+            //Null -> Waiting for response
+            //false -> Failure
+            //true -> Success
+
+            //If any one of these variables is null, we are waiting for response
             if (sourceCompleted == null || resourceCompleted == null)
                 return;
+            //If both are true, both responses have been fetched successfully and can be passed to the user
             if (sourceCompleted && resourceCompleted) {
                 parseCompleteListener.onParseComplete(ravenResource);
                 cache.put(data.toString(), ravenResource);
             } else {
+                //Else we notify failure to the user
                 parseCompleteListener.onParseFailed(new Exception());
             }
         }

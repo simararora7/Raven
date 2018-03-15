@@ -50,4 +50,14 @@ public class RavenResource {
     public void setSourceIdParams(Map<String, Object> sourceIdParams) {
         this.sourceIdParams = sourceIdParams;
     }
+
+    @Override
+    public String toString() {
+        return "<b>RavenResource</b><br>" +
+                "<br><b>resourceType:</b> " + resourceType +
+                "<br><b>resourceId:</b> " + resourceId +
+                "<br><b>sourceId:</b> " + sourceId +
+                "<br><b>resourceIdParams:</b> " + resourceIdParams +
+                "<br><b>sourceIdParams:</b> " + sourceIdParams;
+    }
 }

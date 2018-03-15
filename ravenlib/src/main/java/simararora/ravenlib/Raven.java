@@ -18,15 +18,35 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Raven {
 
-    public static void init(Context context){
+    private static final String TAG = Raven.class.getSimpleName();
+    private static Raven mRaven;
+    private Context mContext;
+    private PrefHelper mPrefHelper;
+
+    private Raven(Context mContext) {
+        this.mContext = mContext;
+        this.mPrefHelper = PrefHelper.getInstance(this.mContext);
+    }
+
+    public static void init(Context context) {
+        if (mRaven == null) {
+            mRaven = new Raven(context);
+            String ravenClientId = mRaven.mPrefHelper.readRavenClientId();
+            boolean isNewRavenClientIdSet;
+            if (ravenClientId == null || ravenClientId.equalsIgnoreCase(PrefHelper.NO_STRING_VALUE)) {
+                Log.i(TAG, "Raven Warning: Please enter your raven client id in your project's Manifest file!");
+            } else
+                isNewRavenClientIdSet = mRaven.mPrefHelper.setRavenClientId(ravenClientId);
+
+        }
         FirebaseApp.initializeApp(context);
     }
 
-    public static void parse(Intent data){
+    public static void parse(Intent data) {
 
     }
 
-    public static void testRead(){
+    public static void testRead() {
         DocumentReference documentReference = FirebaseFirestore.getInstance().document("test/user");
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override

@@ -80,6 +80,37 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92416567272:android:5bc764ef0a588062",
+        "android_client_info": {
+          "package_name": "simararora.ravendashboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92416567272-0ec6s0h8kp5en5n4tlh65omeg50djo71.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD45g8HTi5EmdqbbZYSW3mRvbRmvnnA7B4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

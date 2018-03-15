@@ -2,8 +2,10 @@ package simararora.ravenlib.model;
 
 import android.net.Uri;
 
+import org.json.JSONObject;
+
 import java.net.MalformedURLException;
-import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Created by Simar Arora on 15/03/18.
@@ -13,8 +15,8 @@ public class RavenResource {
     private String resourceType;
     private String resourceId;
     private String sourceId;
-    private Map<String, Object> resourceIdParams;
-    private Map<String, Object> sourceIdParams;
+    private JSONObject resourceIdParams;
+    private JSONObject sourceIdParams;
     private Uri uri;
 
     public RavenResource(Uri uri) throws Exception{
@@ -48,15 +50,19 @@ public class RavenResource {
         return sourceId;
     }
 
-    public Map<String, Object> getResourceIdParams() {
+    public JSONObject getResourceIdParams() {
         return resourceIdParams;
     }
 
-    public void setResourceIdParams(Map<String, Object> resourceIdParams) {
+    public void setResourceIdParams(JSONObject resourceIdParams) {
         this.resourceIdParams = resourceIdParams;
     }
 
-    public void setSourceIdParams(Map<String, Object> sourceIdParams) {
+    public JSONObject getSourceIdParams() {
+        return sourceIdParams;
+    }
+
+    public void setSourceIdParams(JSONObject sourceIdParams) {
         this.sourceIdParams = sourceIdParams;
     }
 
@@ -70,18 +76,25 @@ public class RavenResource {
 
     @Override
     public String toString() {
-        return "<b>RavenResource</b><br>" +
-                "<br><b>resourceType:</b> " + resourceType +
-                "<br><b>resourceId:</b> " + resourceId +
-                "<br><b>sourceId:</b> " + sourceId +
-                mapToString(resourceIdParams) +
-                mapToString(sourceIdParams);
+        try {
+            return "<b>RavenResource</b><br>" +
+                    "<br><b>resourceType:</b> " + resourceType +
+                    "<br><b>resourceId:</b> " + resourceId +
+                    "<br><b>sourceId:</b> " + sourceId +
+                    mapToString(resourceIdParams) +
+                    mapToString(sourceIdParams);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private String mapToString(Map<String, Object> map) {
+    private String mapToString(JSONObject jsonObject) throws Exception{
         StringBuilder s = new StringBuilder();
-        for (String key : map.keySet()) {
-            s.append(String.format("<br><b>%s:</b> ", key)).append(map.get(key));
+        Iterator<String> keys = jsonObject.keys();
+        while( keys.hasNext() ) {
+            String key = keys.next();
+            s.append(String.format("<br><b>%s:</b> ", key)).append(jsonObject.get(key).toString());
         }
         return s.toString();
     }

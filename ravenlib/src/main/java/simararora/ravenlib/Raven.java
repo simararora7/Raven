@@ -3,18 +3,16 @@ package simararora.ravenlib;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import org.json.JSONObject;
 
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import simararora.ravenlib.model.RavenResource;
 
@@ -44,7 +42,6 @@ public class Raven {
             } else
                 mRaven.mPrefHelper.setRavenClientId(ravenClientId);
             mRaven.cache = new LruCache<>(10);
-            FirebaseApp.initializeApp(context);
         }
     }
 
@@ -143,92 +140,74 @@ public class Raven {
             parseCompleteListener.onParseFailed(new NullPointerException(ERROR_MISSING_CLIENT_ID));
             return;
         }
-        String path = String.format("Clients/%s/", clientId);
-        //Parallel requests are sent for source and resource.
-        OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(ravenResource, parseCompleteListener);
-        //Source object is present at Clients/<clientId>/Sources/<sourceDocumentId>/
-        FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("$id", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
-        //Resource object is present at Clients/<clientId>/Resources/<resourceDocumentId>/
-        FirebaseFirestore.getInstance().document(path).collection("Resources").whereEqualTo("$id", String.format("%s-%s", ravenResource.getResourceType(), ravenResource.getResourceId())).get().addOnCompleteListener(onCompleteListener.resourceCompleteListener);
+        new RequestAsyncTask(ravenResource, parseCompleteListener).execute();
     }
 
-    // The OnCompleteListenerComposite object waits for both the responses
-    // and notifies the user once both responses have been successfully fetched
-    private class OnCompleteListenerComposite {
+    private static class RequestAsyncTask extends AsyncTask<Void, Void, Exception> {
 
         private RavenResource ravenResource;
         private ParseCompleteListener parseCompleteListener;
-        private Boolean sourceCompleted;
-        private Boolean resourceCompleted;
 
-        OnCompleteListenerComposite(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
+        RequestAsyncTask(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
             this.ravenResource = ravenResource;
             this.parseCompleteListener = parseCompleteListener;
         }
 
-        /**
-         * Callback called for after fetching source details from server
-         */
-        private OnCompleteListener<QuerySnapshot> sourceOnCompleteListener = new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                    if (!documentSnapshots.isEmpty()) {
-                        //First result matching the query is used
-                        ravenResource.setSourceIdParams(documentSnapshots.get(0).getData());
-                        sourceCompleted = true;
-                    } else
-                        sourceCompleted = false;
-                } else
-                    sourceCompleted = false;
-                checkResponses();
+        @Override
+        protected Exception doInBackground(Void... voids) {
+            HttpURLConnection urlConnection = null;
+            try {
+                URL url = new URL(String.format("https://us-central1-raven-347c7.cloudfunctions.net/api/linkinfo/%s/%s/%s", ravenResource.getResourceType(), ravenResource.getResourceId(), ravenResource.getSourceId()));
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                //Add userid as header
+                urlConnection.setRequestProperty("userid", "Simar");
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    String inputLine;
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while ((inputLine = in.readLine()) != null) {
+                        stringBuilder.append(inputLine);
+                    }
+                    in.close();
+                    String response = stringBuilder.toString();
+                    Log.d(TAG, "doInBackground: " + response);
+                    JSONObject jsonObject = new JSONObject(response);
+                    if (jsonObject.has("sourceData")) {
+                        ravenResource.setSourceIdParams(jsonObject.getJSONObject("sourceData"));
+                    }
+                    if (jsonObject.has("resourceData")) {
+                        ravenResource.setResourceIdParams(jsonObject.getJSONObject("resourceData"));
+                    }
+                    if (ravenResource.isComplete()) {
+                        return null;
+                    } else {
+                        return new Exception("Failed to resolve link data");
+                    }
+                } else {
+                    return new Exception("Http Error " + responseCode);
+                }
+            } catch (Exception e) {
+                return e;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
             }
-        };
+        }
 
-        /**
-         * Callback called for after fetching resource details from server
-         */
-        private OnCompleteListener<QuerySnapshot> resourceCompleteListener = new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> documentSnapshots = task.getResult().getDocuments();
-                    if (!documentSnapshots.isEmpty()) {
-                        //First result matching the query is used
-                        ravenResource.setResourceIdParams(documentSnapshots.get(0).getData());
-                        resourceCompleted = true;
-                    } else
-                        resourceCompleted = false;
-
-                } else
-                    resourceCompleted = false;
-                checkResponses();
-            }
-        };
-
-
-        //checkResponse checks if both responses have been fetched and notifies the user accordingly
-        //Since ths method is going to run on the same thread always, there are no race conditions
-        private void checkResponses() {
-
-            //These variables have three states
-            //Null -> Waiting for response
-            //false -> Failure
-            //true -> Success
-
-            //If any one of these variables is null, we are waiting for response
-            if (sourceCompleted == null || resourceCompleted == null)
-                return;
-            //If both are true, both responses have been fetched successfully and can be passed to the user
-            if (sourceCompleted && resourceCompleted) {
-                parseCompleteListener.onParseComplete(ravenResource);
+        @Override
+        protected void onPostExecute(Exception e) {
+            super.onPostExecute(e);
+            if (e != null) {
+                e.printStackTrace();
+                parseCompleteListener.onParseFailed(e);
+            } else {
                 //Updating our LRU cache
-                cache.put(ravenResource.getUri().toString(), ravenResource);
-            } else
-                //Else we notify failure to the user
-                parseCompleteListener.onParseFailed(new Exception("Failed to resolve link data"));
-
+                mRaven.cache.put(ravenResource.getUri().toString(), ravenResource);
+                parseCompleteListener.onParseComplete(ravenResource);
+            }
         }
     }
 }

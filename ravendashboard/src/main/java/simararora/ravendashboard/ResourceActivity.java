@@ -75,6 +75,8 @@ public class ResourceActivity extends AppCompatActivity implements View.OnClickL
                     LinearLayout llResource = (LinearLayout) llResourceDetails.getChildAt(i);
                     String resourceKey = ((EditText) llResource.findViewById(R.id.et_key)).getText().toString();
                     String resourceValue = ((EditText) llResource.findViewById(R.id.et_value)).getText().toString();
+                    if (AppUtil.isEmptyOrNullString(resourceKey) || AppUtil.isEmptyOrNullString(resourceValue))
+                        continue;
                     resourceKeyValue.put(resourceKey, resourceValue);
                 }
                 if (resourceKeyValue.size() == 0) {

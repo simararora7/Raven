@@ -68,6 +68,8 @@ public class SourceActivity extends AppCompatActivity implements View.OnClickLis
                     LinearLayout llSource = (LinearLayout) llSourceDetails.getChildAt(i);
                     String sourceKey = ((EditText) llSource.findViewById(R.id.et_key)).getText().toString();
                     String sourceValue = ((EditText) llSource.findViewById(R.id.et_value)).getText().toString();
+                    if (AppUtil.isEmptyOrNullString(sourceKey) || AppUtil.isEmptyOrNullString(sourceValue))
+                        continue;
                     sourceKeyValue.put(sourceKey, sourceValue);
                 }
                 if (sourceKeyValue.size() == 0) {

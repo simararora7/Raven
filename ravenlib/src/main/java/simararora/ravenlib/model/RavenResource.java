@@ -57,7 +57,15 @@ public class RavenResource {
                 "<br><b>resourceType:</b> " + resourceType +
                 "<br><b>resourceId:</b> " + resourceId +
                 "<br><b>sourceId:</b> " + sourceId +
-                "<br><b>resourceIdParams:</b> " + resourceIdParams +
-                "<br><b>sourceIdParams:</b> " + sourceIdParams;
+                mapToString(resourceIdParams) +
+                mapToString(sourceIdParams);
+    }
+
+    private String mapToString(Map<String, Object> map) {
+        StringBuilder s = new StringBuilder();
+        for (String key : map.keySet()) {
+            s.append(String.format("<br><b>%s:</b> ", key)).append(map.get(key));
+        }
+        return s.toString();
     }
 }

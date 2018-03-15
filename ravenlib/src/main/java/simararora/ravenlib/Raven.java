@@ -7,8 +7,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.google.firebase.FirebaseApp;
-
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -44,7 +42,6 @@ public class Raven {
             } else
                 mRaven.mPrefHelper.setRavenClientId(ravenClientId);
             mRaven.cache = new LruCache<>(10);
-            FirebaseApp.initializeApp(context);
         }
     }
 

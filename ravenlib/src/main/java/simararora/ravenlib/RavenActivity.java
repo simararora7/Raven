@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 
 public abstract class RavenActivity extends AppCompatActivity implements ParseCompleteListener {
 
-    public static final String TAG = RavenActivity.class.getSimpleName();
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

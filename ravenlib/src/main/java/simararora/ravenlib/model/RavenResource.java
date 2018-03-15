@@ -1,5 +1,7 @@
 package simararora.ravenlib.model;
 
+import android.net.Uri;
+
 import java.net.MalformedURLException;
 import java.util.Map;
 
@@ -13,6 +15,7 @@ public class RavenResource {
     private String sourceId;
     private Map<String, Object> resourceIdParams;
     private Map<String, Object> sourceIdParams;
+    private Uri uri;
 
     public RavenResource(String path) throws Exception{
         //Path is of the type /ab/abcde/abc
@@ -53,6 +56,14 @@ public class RavenResource {
 
     public void setSourceIdParams(Map<String, Object> sourceIdParams) {
         this.sourceIdParams = sourceIdParams;
+    }
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     @Override

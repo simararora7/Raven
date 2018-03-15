@@ -94,8 +94,9 @@ public class Raven {
         try {
             //Create RavenResource object
             RavenResource ravenResource = new RavenResource(path);
+            ravenResource.setUri(data);
             if (parseCompleteListener != null)
-                fetchResourceDetails(data, ravenResource, parseCompleteListener);
+                fetchResourceDetails(ravenResource, parseCompleteListener);
             return ravenResource;
         } catch (Exception e) {
             if (parseCompleteListener != null)
@@ -104,14 +105,14 @@ public class Raven {
         }
     }
 
-    private void fetchResourceDetails(Uri data, RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
+    private void fetchResourceDetails(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
         String clientId = mPrefHelper.getRavenClientId();
         if (clientId == null) {
             parseCompleteListener.onParseFailed(new NullPointerException("Client Id is Null"));
             return;
         }
         String path = String.format("Clients/%s/", clientId);
-        OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(data, ravenResource, parseCompleteListener);
+        OnCompleteListenerComposite onCompleteListener = new OnCompleteListenerComposite(ravenResource, parseCompleteListener);
         //Source object is present at Clients/<clientId>/Sources/<sourceDocumentId>/
         FirebaseFirestore.getInstance().document(path).collection("Sources").whereEqualTo("$id", ravenResource.getSourceId()).get().addOnCompleteListener(onCompleteListener.sourceOnCompleteListener);
         //Resource object is present at Clients/<clientId>/Resources/<resourceDocumentId>/
@@ -123,14 +124,12 @@ public class Raven {
     // and notifies the user once both responses have been successfully fetched
     private class OnCompleteListenerComposite {
 
-        private Uri data;
         private RavenResource ravenResource;
         private ParseCompleteListener parseCompleteListener;
         private Boolean sourceCompleted;
         private Boolean resourceCompleted;
 
-        OnCompleteListenerComposite(Uri data, RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
-            this.data = data;
+        OnCompleteListenerComposite(RavenResource ravenResource, ParseCompleteListener parseCompleteListener) {
             this.ravenResource = ravenResource;
             this.parseCompleteListener = parseCompleteListener;
         }
@@ -187,7 +186,7 @@ public class Raven {
             //If both are true, both responses have been fetched successfully and can be passed to the user
             if (sourceCompleted && resourceCompleted) {
                 parseCompleteListener.onParseComplete(ravenResource);
-                cache.put(data.toString(), ravenResource);
+                cache.put(ravenResource.getUri().toString(), ravenResource);
             } else {
                 //Else we notify failure to the user
                 parseCompleteListener.onParseFailed(new Exception());

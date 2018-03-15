@@ -8,22 +8,21 @@ import simararora.ravenlib.Raven
 import simararora.ravenlib.model.RavenResource
 import java.lang.Exception
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ParseCompleteListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         Raven.init(this)
+        Raven.parse(Uri.parse("https://www.google.com/ab/abcde/abc"), this)
+    }
 
-        Raven.parse(Uri.parse("https://www.google.com/ab/abcde/abc"), object : ParseCompleteListener() {
-            override fun onParseComplete(ravenResource: RavenResource?) {
+    override fun onParseComplete(ravenResource: RavenResource?) {
 
-            }
+    }
 
-            override fun onParseFailed(exception: Exception?) {
+    override fun onParseFailed(exception: Exception?) {
 
-            }
-        })
     }
 }

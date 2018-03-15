@@ -9,6 +9,11 @@ public class Analytics {
     private String data;
     private String dataIdentifier;
 
+    public Analytics(String data, String dataIdentifier) {
+        this.data = data;
+        this.dataIdentifier = dataIdentifier;
+    }
+
     public String getData() {
         return data;
     }

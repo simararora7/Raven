@@ -22,8 +22,9 @@
 
         <activity android:name=".ResourceActivity" />
         <activity android:name=".SourceActivity" />
-        <activity android:name=".history.HistoryActivity" />
+        <activity android:name=".details.HistoryActivity" />
         <activity android:name=".AnalyticsActivity" />
+        <activity android:name=".details.AnalyticsDataActivity" />
     </application>
 
 </manifest>

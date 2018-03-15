@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import java.util.HashMap;
 import java.util.Map;
 
-import simararora.ravendashboard.history.HistoryActivity;
+import simararora.ravendashboard.details.HistoryActivity;
 
 /**
  * Created by nateshrelhan on 3/15/18.

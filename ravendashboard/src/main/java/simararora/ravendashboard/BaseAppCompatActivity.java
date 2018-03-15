@@ -1,12 +1,9 @@
 package simararora.ravendashboard;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
-import simararora.ravendashboard.history.HistoryActivity;
 
 /**
  * Created by nateshrelhan on 3/16/18.

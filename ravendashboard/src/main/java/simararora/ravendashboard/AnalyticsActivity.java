@@ -85,6 +85,7 @@ public class AnalyticsActivity extends BaseAppCompatActivity implements View.OnC
                     Toast.makeText(this, "Please enter input in the correct format as described", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                input = input.trim().toLowerCase();
                 intent = new Intent(this, AnalyticsDataActivity.class);
                 intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_QUERY_BOT);
                 intent.putExtra(AnalyticsDataActivity.KEY_INPUT_QUERY, input);

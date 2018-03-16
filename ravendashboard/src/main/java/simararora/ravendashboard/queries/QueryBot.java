@@ -7,6 +7,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,25 +18,54 @@ import java.util.Map;
 
 public class QueryBot extends Query<Map<String, Integer>> {
     public static final String splitIdentifier_ = "$";
-    private static final String inputDateIdentifier = "date";
-    private static final String[] inputUserIdentifier = {"user", "clickedby", "who", "openedby", "by"};
 
     enum QueryType {
         DATE,
-        OPENED_BY
+        OPENED_BY,
+        RESOURCE_OPENED
     }
 
     private QueryType queryType;
     private String value;
+    private boolean queryTypeFound = false;
+
+    public boolean isQueryTypeFound() {
+        return queryTypeFound;
+    }
 
     public QueryBot(String input) {
-        input = input.toLowerCase();
-        if (input.contains(inputDateIdentifier)) {
-            queryType = QueryType.DATE;
-        } else if (input.contains("openedby")) {
-            queryType = QueryType.OPENED_BY;
+        String[] inputSplit = input.split(" ");
+        if (inputSplit.length == 1)
+            inputSplit = input.split("$");
+
+        for (String specificInput : inputSplit) {
+            if (!queryTypeFound) {
+                switch (specificInput) {
+                    case "date":
+                        queryTypeFound = true;
+                        queryType = QueryType.DATE;
+                        break;
+                    case "clickedby":
+                    case "openedby":
+                    case "by":
+                    case "opened":
+                    case "clicked":
+                    case "who":
+                        queryTypeFound = true;
+                        queryType = QueryType.OPENED_BY;
+                        break;
+                    case "resource":
+                    case "id":
+                    case "resourceid":
+                    case "resource opened":
+                        queryTypeFound = true;
+                        queryType = QueryType.RESOURCE_OPENED;
+                        break;
+                }
+            } else break;
         }
-        this.value = input.substring(input.indexOf(splitIdentifier_) + 1);
+        if (queryTypeFound)
+            this.value = input.substring(input.indexOf(splitIdentifier_) + 1);
     }
 
     @Override
@@ -44,28 +75,47 @@ public class QueryBot extends Query<Map<String, Integer>> {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     Map<String, Integer> resultMap = new HashMap<>();
-                    for (DocumentSnapshot documentSnapshot : task.getResult()) {
-                        Map<String, Object> documentData = documentSnapshot.getData();
-                        switch (queryType) {
-                            case DATE:
-                                String date = (String) documentData.get("$date");
-                                /*if (QueryBot.this.value.equals(date))
-                                    resultMap.put("Resource Id", (String) documentData.get("resID"));*/
-                                break;
-                            case OPENED_BY:
-                                String appUserID = (String) documentData.get("appUserID");
-                                String resId = (String) documentData.get("resID");
-                                if (appUserID != null) {
-                                    appUserID = appUserID.toLowerCase();
-                                    if (QueryBot.this.value.equals(appUserID))
-                                        if (resultMap.containsKey(resId))
-                                            resultMap.put(resId, resultMap.get(resId) + 1);
-                                        else
-                                            resultMap.put(resId, 1);
+                    switch (queryType) {
+                        case DATE:
+                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                Map<String, Object> documentData = documentSnapshot.getData();
+                                Long key = (Long) documentData.get("$date");
+                                String data = (String) documentData.get("resID");
+                                if (key != null && data != null) {
+                                    try {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // here set the pattern as you date in string was containing like date/month/year
+                                        Date dateOfValue = sdf.parse(QueryBot.this.value);
+                                        Date fetchedDate = new Date(key);
+                                        fetchedDate = sdf.parse(sdf.format(fetchedDate));
+                                        if (dateOfValue.compareTo(fetchedDate) == 0)
+                                            if (resultMap.containsKey(data))
+                                                resultMap.put(data, resultMap.get(data) + 1);
+                                            else
+                                                resultMap.put(data, 1);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                        return;
+                                    }
                                 }
-                                break;
-                        }
-
+                            }
+                            break;
+                        case OPENED_BY:
+                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                Map<String, Object> documentData = documentSnapshot.getData();
+                                String key = (String) documentData.get("appUserID");
+                                String data = (String) documentData.get("resID");
+                                if (key != null && data != null) {
+                                    if (QueryBot.this.value.equals(key.toLowerCase())) {
+                                        if (resultMap.containsKey(data))
+                                            resultMap.put(data, resultMap.get(data) + 1);
+                                        else
+                                            resultMap.put(data, 1);
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            return;
                     }
                     queryCompleteListener.onSuccess(resultMap);
                 } else

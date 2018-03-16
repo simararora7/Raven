@@ -204,22 +204,24 @@ public class AnalyticsDataActivity extends BaseAppCompatActivity {
 
             case KEY_QUERY_BOT:
                 setUpActionBar("Indefinite Query", true);
-                new QueryBot(getIntent().getStringExtra(KEY_INPUT_QUERY)).execute(new Query.QueryCompleteListener<Map<String, Integer>>() {
-                    @Override
-                    public void onSuccess(Map<String, Integer> result) {
-                        List<Analytics> analyticsList = new ArrayList<>();
-                        if (result.size() != 0) {
-                            for (Map.Entry<String, Integer> entry : result.entrySet())
-                                analyticsList.add(new Analytics(entry.getKey(), String.valueOf(entry.getValue())));
+                QueryBot queryBot = new QueryBot(getIntent().getStringExtra(KEY_INPUT_QUERY));
+                if (queryBot.isQueryTypeFound())
+                    queryBot.execute(new Query.QueryCompleteListener<Map<String, Integer>>() {
+                        @Override
+                        public void onSuccess(Map<String, Integer> result) {
+                            List<Analytics> analyticsList = new ArrayList<>();
+                            if (result.size() != 0) {
+                                for (Map.Entry<String, Integer> entry : result.entrySet())
+                                    analyticsList.add(new Analytics(entry.getKey(), String.valueOf(entry.getValue())));
+                            }
+                            rvResourceHistory.setAdapter(new AnalyticsDataAdapter(analyticsList));
                         }
-                        rvResourceHistory.setAdapter(new AnalyticsDataAdapter(analyticsList));
-                    }
 
-                    @Override
-                    public void onFailure() {
+                        @Override
+                        public void onFailure() {
 
-                    }
-                });
+                        }
+                    });
                 break;
         }
 

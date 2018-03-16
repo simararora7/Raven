@@ -19,6 +19,8 @@ public class AnalyticsActivity extends BaseAppCompatActivity implements View.OnC
         setUpActionBar("Analytics", true);
         findViewById(R.id.tv_influencer).setOnClickListener(this);
         findViewById(R.id.tv_popular_platform).setOnClickListener(this);
+        findViewById(R.id.tv_connections_directed).setOnClickListener(this);
+        findViewById(R.id.tv_connections_undirected).setOnClickListener(this);
     }
 
     @Override
@@ -33,6 +35,16 @@ public class AnalyticsActivity extends BaseAppCompatActivity implements View.OnC
             case R.id.tv_popular_platform:
                 intent = new Intent(this, AnalyticsDataActivity.class);
                 intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_POPULAR_PLATFORM);
+                startActivity(intent);
+                break;
+            case R.id.tv_connections_directed:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_CONNECTIONS_DIRECTED);
+                startActivity(intent);
+                break;
+            case R.id.tv_connections_undirected:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_CONNECTIONS_UNDIRECTED);
                 startActivity(intent);
                 break;
         }

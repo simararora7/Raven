@@ -29,13 +29,14 @@ public class ConnecteionsUndirectedQuery extends Query<Map<String, Integer>> {
                         String connection = (String) documentData.get("connection");
                         if (connection != null) {
                             String[] tokens = connection.split("-");
+                            if (tokens.length < 2) continue;
                             Arrays.sort(tokens);
                             connection = tokens[0] + "-" + tokens[1];
                             connection = connection.replace("-", ", ");
                             connection = String.format("( %s )", connection);
-                            if (resultMap.containsKey(connection)){
+                            if (resultMap.containsKey(connection)) {
                                 resultMap.put(connection, resultMap.get(connection) + 1);
-                            }else{
+                            } else {
                                 resultMap.put(connection, 1);
                             }
                         }

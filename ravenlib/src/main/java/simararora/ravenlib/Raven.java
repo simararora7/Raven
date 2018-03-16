@@ -46,7 +46,7 @@ public class Raven {
         }
     }
 
-    public static void setUserIdentifier(String userIdentifier){
+    public void setUserIdentifier(String userIdentifier){
         if (mRaven == null)
             throw new RuntimeException(EXCEPTION_PREFIX + "init needs to be called before setUserIdentifier is called");
         mRaven.userIdentifier = userIdentifier;

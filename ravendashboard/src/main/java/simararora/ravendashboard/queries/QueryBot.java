@@ -114,6 +114,21 @@ public class QueryBot extends Query<Map<String, Integer>> {
                                 }
                             }
                             break;
+                        case RESOURCE_OPENED:
+                            for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                                Map<String, Object> documentData = documentSnapshot.getData();
+                                String key = (String) documentData.get("resID");
+                                String data = (String) documentData.get("appUserID");
+                                if (key != null && data != null) {
+                                    if (QueryBot.this.value.equals(key.toLowerCase())) {
+                                        if (resultMap.containsKey(data))
+                                            resultMap.put(data, resultMap.get(data) + 1);
+                                        else
+                                            resultMap.put(data, 1);
+                                    }
+                                }
+                            }
+                            break;
                         default:
                             return;
                     }

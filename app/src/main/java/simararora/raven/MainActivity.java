@@ -3,8 +3,11 @@ package simararora.raven;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import simararora.ravenlib.Raven;
 import simararora.ravenlib.RavenActivity;
 import simararora.ravenlib.model.RavenResource;
 
@@ -23,12 +26,22 @@ public class MainActivity extends RavenActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_raven);
         messageView = findViewById(R.id.tv_data);
-        if (ravenResource != null){
+        if (ravenResource != null) {
             messageView.setText(Html.fromHtml(ravenResource.toString()));
-        }else if (exception != null){
+        } else if (exception != null) {
             messageView.setText(exception.getMessage());
         }
-
+        EditText etUsername = findViewById(R.id.et_username);
+        final String username = etUsername.getText().toString();
+        findViewById(R.id.bt_submit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (username != null && !username.isEmpty())
+                    Raven.getInstance().setUserIdentifier(username);
+                else
+                    Raven.getInstance().setUserIdentifier("Simar");
+            }
+        });
     }
 
     @Override

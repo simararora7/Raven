@@ -14,6 +14,5 @@ public class RavenApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Raven.init(this);
-        Raven.setUserIdentifier("Simar");
     }
 }

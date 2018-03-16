@@ -19,11 +19,13 @@ public class Request {
     @Expose
     private Map<String, String> data;
 
+    //Used in case of Resource
     public Request(String type, Map<String, String> data) {
         this.type = type;
         this.data = data;
     }
 
+    //Used in case of Source
     public Request(Map<String, String> data) {
         this.data = data;
     }

@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import simararora.ravendashboard.R;
@@ -30,6 +32,12 @@ public class AnalyticsDataAdapter extends RecyclerView.Adapter<AnalyticsDataAdap
     }
 
     public AnalyticsDataAdapter(List<Analytics> analyticsList) {
+        Collections.sort(analyticsList, new Comparator<Analytics>() {
+            @Override
+            public int compare(Analytics lhs, Analytics rhs) {
+                return Integer.valueOf(rhs.getDataIdentifier()).compareTo(Integer.valueOf(lhs.getDataIdentifier()));
+            }
+        });
         this.analyticsList = analyticsList;
     }
 

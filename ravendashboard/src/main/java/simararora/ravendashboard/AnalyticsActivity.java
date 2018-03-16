@@ -21,6 +21,10 @@ public class AnalyticsActivity extends BaseAppCompatActivity implements View.OnC
         findViewById(R.id.tv_popular_platform).setOnClickListener(this);
         findViewById(R.id.tv_connections_directed).setOnClickListener(this);
         findViewById(R.id.tv_connections_undirected).setOnClickListener(this);
+        findViewById(R.id.tv_os).setOnClickListener(this);
+        findViewById(R.id.tv_platform).setOnClickListener(this);
+        findViewById(R.id.tv_broswer).setOnClickListener(this);
+        findViewById(R.id.tv_user_agent).setOnClickListener(this);
     }
 
     @Override
@@ -45,6 +49,26 @@ public class AnalyticsActivity extends BaseAppCompatActivity implements View.OnC
             case R.id.tv_connections_undirected:
                 intent = new Intent(this, AnalyticsDataActivity.class);
                 intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_CONNECTIONS_UNDIRECTED);
+                startActivity(intent);
+                break;
+            case R.id.tv_os:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_OS);
+                startActivity(intent);
+                break;
+            case R.id.tv_platform:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_PLATFORM);
+                startActivity(intent);
+                break;
+            case R.id.tv_broswer:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_BROWSER);
+                startActivity(intent);
+                break;
+            case R.id.tv_user_agent:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_USER_AGENT);
                 startActivity(intent);
                 break;
         }

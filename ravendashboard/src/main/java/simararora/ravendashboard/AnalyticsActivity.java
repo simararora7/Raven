@@ -18,15 +18,22 @@ public class AnalyticsActivity extends BaseAppCompatActivity implements View.OnC
         setContentView(R.layout.activity_analytics);
         setUpActionBar("Analytics", true);
         findViewById(R.id.tv_influencer).setOnClickListener(this);
+        findViewById(R.id.tv_popular_platform).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Intent intent;
         switch (v.getId()) {
             case R.id.tv_influencer:
-                Intent intentRealInfluencer = new Intent(this, AnalyticsDataActivity.class);
-                intentRealInfluencer.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_REAL_INFLUENCER);
-                startActivity(intentRealInfluencer);
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_REAL_INFLUENCER);
+                startActivity(intent);
+                break;
+            case R.id.tv_popular_platform:
+                intent = new Intent(this, AnalyticsDataActivity.class);
+                intent.putExtra(AnalyticsDataActivity.KEY_ANALYTICS_TYPE, AnalyticsDataActivity.KEY_POPULAR_PLATFORM);
+                startActivity(intent);
                 break;
         }
     }

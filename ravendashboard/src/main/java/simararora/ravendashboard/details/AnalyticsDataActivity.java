@@ -14,6 +14,7 @@ import simararora.ravendashboard.R;
 import simararora.ravendashboard.adapter.AnalyticsDataAdapter;
 import simararora.ravendashboard.model.Analytics;
 import simararora.ravendashboard.queries.InfluencerQuery;
+import simararora.ravendashboard.queries.PopularPlatformQuery;
 import simararora.ravendashboard.queries.Query;
 
 /**
@@ -23,6 +24,7 @@ import simararora.ravendashboard.queries.Query;
 public class AnalyticsDataActivity extends BaseAppCompatActivity {
     public static final String KEY_ANALYTICS_TYPE = "analytics_type_";
     public static final String KEY_REAL_INFLUENCER = "real_influencer";
+    public static final String KEY_POPULAR_PLATFORM = "popular_platform";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +52,25 @@ public class AnalyticsDataActivity extends BaseAppCompatActivity {
 
                     }
                 });
+                break;
+            case KEY_POPULAR_PLATFORM:
+                setUpActionBar("Popular Platform", true);
+                new PopularPlatformQuery().execute(new Query.QueryCompleteListener<Map<String, Integer>>() {
+                    @Override
+                    public void onSuccess(Map<String, Integer> result) {
+                        List<Analytics> analyticsList = new ArrayList<>();
+                        if (result.size() != 0) {
+                            for (Map.Entry<String, Integer> entry : result.entrySet())
+                                analyticsList.add(new Analytics(entry.getKey(), String.valueOf(entry.getValue())));
+                        }
+                        rvResourceHistory.setAdapter(new AnalyticsDataAdapter(analyticsList));
+                    }
 
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
                 break;
         }
 

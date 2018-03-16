@@ -6,6 +6,7 @@ import android.text.Html;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import simararora.ravenlib.Raven;
 import simararora.ravenlib.RavenActivity;
@@ -31,14 +32,15 @@ public class MainActivity extends RavenActivity {
         } else if (exception != null) {
             messageView.setText(exception.getMessage());
         }
-        EditText etUsername = findViewById(R.id.et_username);
-        final String username = etUsername.getText().toString();
+        final EditText etUsername = findViewById(R.id.et_username);
         findViewById(R.id.bt_submit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (username != null && !username.isEmpty())
+                String username = etUsername.getText().toString();
+                if (username != null && !username.isEmpty()) {
                     Raven.getInstance().setUserIdentifier(username);
-                else
+                    Toast.makeText(MainActivity.this, "Raven initialized with " + username, Toast.LENGTH_SHORT).show();
+                } else
                     Raven.getInstance().setUserIdentifier("Simar");
             }
         });

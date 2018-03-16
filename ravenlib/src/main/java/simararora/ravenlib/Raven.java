@@ -28,6 +28,7 @@ public class Raven {
     private static Raven mRaven;
     private PrefHelper mPrefHelper;
     private LruCache<String, RavenResource> cache;
+    private String userIdentifier;
 
     private Raven(Context mContext) {
         this.mPrefHelper = PrefHelper.getInstance(mContext);
@@ -43,6 +44,12 @@ public class Raven {
                 mRaven.mPrefHelper.setRavenClientId(ravenClientId);
             mRaven.cache = new LruCache<>(10);
         }
+    }
+
+    public static void setUserIdentifier(String userIdentifier){
+        if (mRaven == null)
+            throw new RuntimeException(EXCEPTION_PREFIX + "init needs to be called before setUserIdentifier is called");
+        mRaven.userIdentifier = userIdentifier;
     }
 
     public static Raven getInstance() {
@@ -161,7 +168,7 @@ public class Raven {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 //Add userid as header
-                urlConnection.setRequestProperty("userid", "Simar");
+                urlConnection.setRequestProperty("userid", mRaven.userIdentifier);
                 int responseCode = urlConnection.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));

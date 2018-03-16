@@ -23,6 +23,7 @@ import simararora.ravenlib.model.RavenResource;
 public class Raven {
     private static final String TAG = Raven.class.getSimpleName();
     private static final String authority = "raven.lt";
+    private static final String authority2 = "raven-347c7.firebaseapp.com";
     private static final String EXCEPTION_PREFIX = "Raven Warning: ";
     private static final String ERROR_MISSING_CLIENT_ID = EXCEPTION_PREFIX + "Please enter your raven client id in your project's Manifest file!";
     private static Raven mRaven;
@@ -113,10 +114,9 @@ public class Raven {
         if (cachedResource != null) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseComplete(cachedResource);
-            return cachedResource;
         }
         //Check if the url needs to be handled by Raven
-        if (!Raven.authority.equals(data.getAuthority())) {
+        if (!Raven.authority.equals(data.getAuthority()) && !Raven.authority2.equals(data.getAuthority())) {
             if (parseCompleteListener != null)
                 parseCompleteListener.onParseFailed(new Exception("Authority Mismatch"));
             return null;

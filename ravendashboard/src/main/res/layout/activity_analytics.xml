@@ -1,70 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:weightSum="1">
+
+        <EditText
+            android:id="@+id/et_query_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:fontFamily="sans-serif-smallcaps"
+            android:hint="Input Query"
+            android:maxLines="1"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/bt_submit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.2"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="Submit"
+            android:textColor="@color/colorPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        >
+        android:weightSum="2">
 
-    <TextView
-        android:maxLines="2"
-        android:lines="2"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:id="@+id/tv_influencer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="sans-serif-smallcaps"
-        android:padding="12dp"
-        android:text="Real Influencer"
-        android:textColor="@color/colorPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tv_influencer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
+            android:padding="12dp"
+            android:text="Real Influencer"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:layout_weight="1"
-        android:maxLines="2"
-        android:lines="2"
-        android:gravity="center"
-        android:id="@+id/tv_popular_platform"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="sans-serif-smallcaps"
-        android:padding="12dp"
-        android:text="Popular Platform"
-        android:textColor="@color/colorPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tv_popular_platform"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
+            android:padding="12dp"
+            android:text="Popular Platform"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:weightSum="2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        >
+        android:weightSum="2">
 
         <TextView
-            android:maxLines="2"
-            android:lines="2"
-            android:layout_weight="1"
-            android:gravity="center"
             android:id="@+id/tv_connections_directed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
+            android:layout_weight="1"
             android:background="@color/colorAccent"
             android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
             android:padding="12dp"
             android:text="Connections (Directed)"
             android:textColor="@color/colorPrimary"
@@ -72,16 +101,16 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_weight="1"
-            android:maxLines="2"
-            android:lines="2"
-            android:gravity="center"
             android:id="@+id/tv_connections_undirected"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
+            android:layout_weight="1"
             android:background="@color/colorAccent"
             android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
             android:padding="12dp"
             android:text="Connectiions (Undirected)"
             android:textColor="@color/colorPrimary"
@@ -91,23 +120,22 @@
     </LinearLayout>
 
     <LinearLayout
-        android:weightSum="2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        >
+        android:weightSum="2">
 
         <TextView
-            android:maxLines="2"
-            android:lines="2"
-            android:layout_weight="1"
-            android:gravity="center"
             android:id="@+id/tv_os"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
+            android:layout_weight="1"
             android:background="@color/colorAccent"
             android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
             android:padding="12dp"
             android:text="OS"
             android:textColor="@color/colorPrimary"
@@ -115,16 +143,16 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_weight="1"
-            android:maxLines="2"
-            android:lines="2"
-            android:gravity="center"
             android:id="@+id/tv_platform"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
+            android:layout_weight="1"
             android:background="@color/colorAccent"
             android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
             android:padding="12dp"
             android:text="Platfornm"
             android:textColor="@color/colorPrimary"
@@ -134,23 +162,22 @@
     </LinearLayout>
 
     <LinearLayout
-        android:weightSum="2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        >
+        android:weightSum="2">
 
         <TextView
-            android:maxLines="2"
-            android:lines="2"
-            android:layout_weight="1"
-            android:gravity="center"
             android:id="@+id/tv_broswer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
+            android:layout_weight="1"
             android:background="@color/colorAccent"
             android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
             android:padding="12dp"
             android:text="Browser"
             android:textColor="@color/colorPrimary"
@@ -158,18 +185,18 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_weight="1"
-            android:maxLines="2"
-            android:lines="2"
-            android:gravity="center"
             android:id="@+id/tv_user_agent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="12dp"
-            android:text="User Agent"
+            android:layout_weight="1"
             android:background="@color/colorAccent"
             android:fontFamily="sans-serif-smallcaps"
+            android:gravity="center"
+            android:lines="2"
+            android:maxLines="2"
             android:padding="12dp"
+            android:text="User Agent"
             android:textColor="@color/colorPrimary"
             android:textSize="20sp"
             android:textStyle="bold" />

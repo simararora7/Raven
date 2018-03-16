@@ -7,7 +7,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,8 +14,8 @@ import java.util.Map;
  * Created by nateshrelhan on 3/16/18.
  */
 
-public class QueryBot extends Query<Map<String, String>> {
-    private static final String splitIdentifier_ = "$";
+public class QueryBot extends Query<Map<String, Integer>> {
+    public static final String splitIdentifier_ = "$";
     private static final String inputDateIdentifier = "date";
     private static final String[] inputUserIdentifier = {"user", "clickedby", "who", "openedby", "by"};
 
@@ -27,45 +26,43 @@ public class QueryBot extends Query<Map<String, String>> {
 
     private QueryType queryType;
     private String value;
-    private boolean error = false;
-
-    public boolean isError() {
-        return error;
-    }
 
     public QueryBot(String input) {
-        if (!input.contains(splitIdentifier_) && input.indexOf(splitIdentifier_) != input.length() - 1) {
-            error = true;
-            return;
-        }
         input = input.toLowerCase();
         if (input.contains(inputDateIdentifier)) {
             queryType = QueryType.DATE;
-        } else if (Arrays.asList(inputUserIdentifier).contains(input)) {
+        } else if (input.contains("openedby")) {
             queryType = QueryType.OPENED_BY;
         }
         this.value = input.substring(input.indexOf(splitIdentifier_) + 1);
     }
 
     @Override
-    void execute(final QueryCompleteListener<Map<String, String>> queryCompleteListener) {
+    public void execute(final QueryCompleteListener<Map<String, Integer>> queryCompleteListener) {
         getDocumentReference().collection("Interactions").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    Map<String, String> resultMap = new HashMap<>();
+                    Map<String, Integer> resultMap = new HashMap<>();
                     for (DocumentSnapshot documentSnapshot : task.getResult()) {
                         Map<String, Object> documentData = documentSnapshot.getData();
                         switch (queryType) {
                             case DATE:
                                 String date = (String) documentData.get("$date");
-                                if (QueryBot.this.value.equals(date))
-                                    resultMap.put("Resource Id", (String) documentData.get("resID"));
+                                /*if (QueryBot.this.value.equals(date))
+                                    resultMap.put("Resource Id", (String) documentData.get("resID"));*/
                                 break;
                             case OPENED_BY:
                                 String appUserID = (String) documentData.get("appUserID");
-                                if (QueryBot.this.value.equals(appUserID))
-                                    resultMap.put("Resource Id", (String) documentData.get("resID"));
+                                String resId = (String) documentData.get("resID");
+                                if (appUserID != null) {
+                                    appUserID = appUserID.toLowerCase();
+                                    if (QueryBot.this.value.equals(appUserID))
+                                        if (resultMap.containsKey(resId))
+                                            resultMap.put(resId, resultMap.get(resId) + 1);
+                                        else
+                                            resultMap.put(resId, 1);
+                                }
                                 break;
                         }
 

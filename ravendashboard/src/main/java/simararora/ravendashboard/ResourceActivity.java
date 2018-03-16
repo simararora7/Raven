@@ -4,10 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,17 +42,8 @@ public class ResourceActivity extends BaseCreateDataActivity implements View.OnC
                     Toast.makeText(this, "Please enter resource name to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                boolean resourceKeyValeNotEmpty = false;
-                for (int i = 0; i < llDetails.getChildCount(); i++) {
-                    LinearLayout llResource = (LinearLayout) llDetails.getChildAt(i);
-                    String resourceKey = ((EditText) llResource.findViewById(R.id.et_key)).getText().toString();
-                    String resourceValue = ((EditText) llResource.findViewById(R.id.et_value)).getText().toString();
-                    if (AppUtil.isEmptyOrNullString(resourceKey) || AppUtil.isEmptyOrNullString(resourceValue))
-                        continue;
-                    resourceKeyValeNotEmpty = true;
-                    keyValue.put(resourceKey, resourceValue);
-                }
-                if (!resourceKeyValeNotEmpty || keyValue.size() == 0) {
+                Map<String, String> keyValue = getKeyValue();
+                if (keyValue == null) {
                     Toast.makeText(this, "Please enter at least one resource detail to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }

@@ -23,7 +23,7 @@ import simararora.ravendashboard.details.HistoryActivity;
 
 public class BaseCreateDataActivity extends BaseAppCompatActivity implements View.OnClickListener {
     protected LinearLayout llDetails;
-    protected Map<String, String> keyValue;
+    private Map<String, String> keyValue;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -95,5 +95,21 @@ public class BaseCreateDataActivity extends BaseAppCompatActivity implements Vie
                 llDetails.addView(llNewResource);
                 break;
         }
+    }
+
+    protected Map<String, String> getKeyValue() {
+        boolean keyValeNotEmpty = false;
+        for (int i = 0; i < llDetails.getChildCount(); i++) {
+            LinearLayout llSource = (LinearLayout) llDetails.getChildAt(i);
+            String key = ((EditText) llSource.findViewById(R.id.et_key)).getText().toString();
+            String value = ((EditText) llSource.findViewById(R.id.et_value)).getText().toString();
+            if (AppUtil.isEmptyOrNullString(key) || AppUtil.isEmptyOrNullString(value))
+                continue;
+            keyValeNotEmpty = true;
+            keyValue.put(key, value);
+        }
+        if (!keyValeNotEmpty || keyValue.size() == 0)
+            return null;
+        return keyValue;
     }
 }

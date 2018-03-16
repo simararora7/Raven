@@ -4,12 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,7 +27,6 @@ public class SourceActivity extends BaseCreateDataActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source);
         setUpActionBar("Source", true);
-        keyValue = new HashMap<>();
         initializeCommonLayout();
         etUsername = findViewById(R.id.et_username);
     }
@@ -43,17 +41,8 @@ public class SourceActivity extends BaseCreateDataActivity implements View.OnCli
                     Toast.makeText(this, "Please enter username to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                boolean sourceKeyValeNotEmpty = false;
-                for (int i = 0; i < llDetails.getChildCount(); i++) {
-                    LinearLayout llSource = (LinearLayout) llDetails.getChildAt(i);
-                    String sourceKey = ((EditText) llSource.findViewById(R.id.et_key)).getText().toString();
-                    String sourceValue = ((EditText) llSource.findViewById(R.id.et_value)).getText().toString();
-                    if (AppUtil.isEmptyOrNullString(sourceKey) || AppUtil.isEmptyOrNullString(sourceValue))
-                        continue;
-                    sourceKeyValeNotEmpty = true;
-                    keyValue.put(sourceKey, sourceValue);
-                }
-                if (!sourceKeyValeNotEmpty || keyValue.size() == 0) {
+                Map<String, String> keyValue = getKeyValue();
+                if (keyValue == null) {
                     Toast.makeText(this, "Please enter at least one source detail to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }

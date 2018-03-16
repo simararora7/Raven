@@ -21,6 +21,8 @@ import simararora.ravendashboard.model.Request;
  */
 
 public class SourceActivity extends BaseCreateDataActivity implements View.OnClickListener {
+    private EditText etUsername;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +30,7 @@ public class SourceActivity extends BaseCreateDataActivity implements View.OnCli
         setUpActionBar("Source", true);
         keyValue = new HashMap<>();
         initializeCommonLayout();
+        etUsername = findViewById(R.id.et_username);
     }
 
     @Override
@@ -35,6 +38,11 @@ public class SourceActivity extends BaseCreateDataActivity implements View.OnCli
         super.onClick(v);
         switch (v.getId()) {
             case R.id.bt_submit:
+                String username = etUsername.getText().toString();
+                if (AppUtil.isEmptyOrNullString(username)) {
+                    Toast.makeText(this, "Please enter username to proceed", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 boolean sourceKeyValeNotEmpty = false;
                 for (int i = 0; i < llDetails.getChildCount(); i++) {
                     LinearLayout llSource = (LinearLayout) llDetails.getChildAt(i);
@@ -49,6 +57,7 @@ public class SourceActivity extends BaseCreateDataActivity implements View.OnCli
                     Toast.makeText(this, "Please enter at least one source detail to proceed", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                keyValue.put("$userId", username);
                 final Request sourceRequest = new Request(keyValue);
                 DashboardApplication.getAPIService(this).createSource(new Request(keyValue))
                         .enqueue(new Callback<String>() {

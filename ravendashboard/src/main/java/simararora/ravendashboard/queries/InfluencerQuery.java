@@ -43,7 +43,7 @@ public class InfluencerQuery extends Query<Map<String, Integer>> {
                     for (DocumentSnapshot documentSnapshot : task.getResult()) {
                         Map<String, Object> documentData = documentSnapshot.getData();
                         Map<String, Object> sourceData = (Map<String, Object>) documentData.get("sourceData");
-                        String userId = (String) sourceData.get("$id");
+                        String userId = (String) sourceData.get("$userId");
                         if (userId != null){
                             if (resultMap.containsKey(userId)){
                                 resultMap.put(userId, resultMap.get(userId) + 1);
